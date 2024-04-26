@@ -3,6 +3,7 @@ import "../style/main.css";
 import { utils } from "./helpers/Utils.js";
 import { states } from "./helpers/States.js";
 import NumberElement from "./NumberElement.jsx";
+import PlayAgain from "./PlayAgain.jsx";
 
 import StarsBox from "./StarsBox.jsx";
 
@@ -14,6 +15,14 @@ const StarMatch = () => {
   const [candidateNums, setCandidateNums] = useState([]);
 
   const candidatesAreWrong = utils.sum(candidateNums) > stars;
+  const gameIsDone = availableNums.length === 0;
+  const gameIsWon = availableNums.length === 0;
+
+  const resetGame = () => {
+    setStars(utils.random(1, 9));
+    setAvailableNums(utils.range(1, 9));
+    setCandidateNums([]);
+  };
 
   const onNumberClick = (num, numStatus) => {
     switch (numStatus) {
@@ -60,7 +69,11 @@ const StarMatch = () => {
       </div>
       <div className="body">
         <div className="left">
-          <StarsBox count={stars} />
+          {gameIsDone ? (
+            <PlayAgain onClick={resetGame} />
+          ) : (
+            <StarsBox count={stars} />
+          )}
         </div>
         <div className="right">
           {utils.range(1, 9).map((numberId) => (
