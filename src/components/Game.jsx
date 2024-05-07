@@ -6,27 +6,11 @@ import NumberElement from "./NumberElement.jsx";
 import PlayAgain from "./PlayAgain.jsx";
 
 import StarsBox from "./StarsBox.jsx";
+import useGameState from "./useGameState.jsx";
 
 const Game = (props) => {
-  const [stars, setStars] = useState(utils.random(1, 9));
-  //const [availableNums, setAvailableNums] = useState([1, 2, 3, 4, 5]);
-  const [availableNums, setAvailableNums] = useState(utils.range(1, 9));
-  //const [candidateNums, setcandidateNums] = useState([2, 3]);
-  const [candidateNums, setCandidateNums] = useState([]);
-  const [secondsLeft, setSecondsLeft] = useState(10);
-
-  // setInterval, setTimeout
-  useEffect(() => {
-    if (!gameIsDone) {
-      const timerId = setTimeout(() => {
-        setSecondsLeft(secondsLeft - 1);
-      }, 1000);
-
-      // Cleanup effect (what to do befor re.render on changing)
-      return () => clearTimeout(timerId);
-    }
-  });
-
+  const { stars, availableNums, candidateNums, secondsLeft, setGameState } =
+    useGameState();
   const candidatesAreWrong = utils.sum(candidateNums) > stars;
   const gameStatus =
     availableNums.length === 0 ? "won" : secondsLeft === 0 ? "lost" : "running";
@@ -38,25 +22,9 @@ const Game = (props) => {
         case states.used:
           break;
         case states.available:
-          const newCandidatesNums = candidateNums.concat(num);
-          if (utils.sum(newCandidatesNums) !== stars)
-            setCandidateNums(newCandidatesNums);
-          else {
-            //Calculate new avaiable nums
-            const newAvailableNumbers = availableNums.filter(
-              (n) => !newCandidatesNums.includes(n)
-            );
-            //Set new availablenums
-            setAvailableNums(newAvailableNumbers);
-            //Clear candidates nums
-            setCandidateNums([]);
-            //Set new stars
-            setStars(utils.randomSumIn(newAvailableNumbers, 9));
-          }
-          break;
         case states.wrong:
         case states.candidate:
-          setCandidateNums(candidateNums.filter((n) => n !== num));
+          setGameState(num, numStatus);
           break;
       }
     }
